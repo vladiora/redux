@@ -1,24 +1,38 @@
 import { useSelector, useDispatch } from "react-redux"
 import { voteFor } from "../reducers/anecdoteReducer"
+import { setNotification } from "../reducers/notificationReducer"
+import Notification from "./Notification"
 
 const AnecdoteList = () => {
 
-	const anecdotes = useSelector(state => {
-		return state.anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(state.filter.toLowerCase()))
+	const anecdoteList = useSelector(({filter, anecdotes}) => {
+		return anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
 	})
 
   	const dispatch = useDispatch()
 
+	const handleClik = (id, content) => {
+
+		dispatch(setNotification(`you voted '${content}'`))
+
+		dispatch(voteFor(id))
+
+		setTimeout(() => {
+			dispatch(setNotification(''))
+		}, 5000)
+	}
+
 	return (
 		<div>
-			{anecdotes.map(anecdote =>
+			<Notification />
+			{anecdoteList.map(anecdote =>
 				<div key={anecdote.id}>
 				<div>
 					{anecdote.content}
 				</div>
 				<div>
 					has {anecdote.votes}
-					<button onClick={() => dispatch(voteFor(anecdote.id))}>vote</button>
+					<button onClick={() => handleClik(anecdote.id, anecdote.content)}>vote</button>
 				</div>
 				</div>
 			)}
